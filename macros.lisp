@@ -80,13 +80,12 @@
 	       `(quote ,thing))
 
 	     (extract-from (body)
-	       (if (eq (first body) :from)
-		   (let ((states (second body)))
-		     (values (if (listp states)
-				 (cons 'or (mapcar #'make-quote states))
-				 (list 'quote states))
-			     (cddr body)))
-		   (values '_ body)))
+	       (match body
+		 ((list* :from states body)
+		  (values (cons 'or (mapcar #'make-quote (ensure-list states)))
+			  body))
+
+		 (_ (values '_ body))))
 
 	     (make-clause (state)
 	       (destructuring-bind (name pattern . body) state
@@ -102,6 +101,6 @@
 	  (eq (first states) :start)
 
 	`(labels ((,g!next (,from-state ,g!force ,g!arg)
-		    (multiple-value-match (values ,from-state ,g!arg)
+		    (match* (,from-state ,g!arg)
 		      ,@(mapcar #'make-clause body))))
 	   (,g!next ,start nil ,arg))))))
