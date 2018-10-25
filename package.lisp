@@ -33,6 +33,9 @@
    :let-if
    :match-state
 
+   ;; Macro Writing
+   :gensyms
+
    ;; Packages
    :merge-packages
    :define-merged-package
@@ -43,4 +46,7 @@
    :enqueue
    :dequeue
    :enqueue-list
-   :queue->list))
+   :queue->list
+
+   ;; Utility Functions
+   :repeat-function))

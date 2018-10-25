@@ -111,3 +111,12 @@
   "Returns a list of the elements in QUEUE."
 
   (car queue))
+
+
+;;;; Utility Functions
+
+(defun repeat-function (fn n)
+  "Returns a list of N items obtained by repeatedly calling the
+   function FN."
+
+  (loop repeat n collect (funcall fn)))
