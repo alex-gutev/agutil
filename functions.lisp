@@ -52,7 +52,7 @@
   (flet ((merge-package (pkg)
 	   (do-external-symbols (sym pkg)
 	     (shadowing-import (list sym))
-	     (export sym))))
+	     (export (list sym)))))
 
     (let ((*package* (or (find-package new-package-name) (make-package new-package-name :use nil))))
       (mapc #'merge-package packages)
