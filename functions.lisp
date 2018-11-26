@@ -116,7 +116,7 @@
 ;;;; Utility Functions
 
 (defun repeat-function (fn n)
-  "Returns a list of N items obtained by repeatedly calling the
-   function FN."
+  "Returns a list of N items obtained by calling the function FN N
+   times."
 
   (loop repeat n collect (funcall fn)))

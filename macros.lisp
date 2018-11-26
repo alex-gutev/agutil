@@ -27,9 +27,10 @@
 
 
 (defmacro! let-if ((&rest bindings) condition &body body)
-  "Allows variables to be initialized with different init-forms based
-   on a condition. BINDINGS is a list of bindings where the first
-   element is the symbol the second element is the init-form to
+  "Binds variables to different values computed by different
+   init-forms based on whether CONDITION evaluates to true or
+   false. BINDINGS is a list of bindings where the first element is
+   the variable symbol the second element is the init-form to
    evaluated if CONDITION evaluates to true, the second element is the
    init-form to evaluate if CONDITION evaluates to false."
 
@@ -50,29 +51,34 @@
 	   ,@body)))))
 
 (defmacro! match-state (arg &body states)
-  "Implements an FSM where each state may specify a pattern and a list
-   of from states, when the argument matches the pattern of a
-   particular and the current state is in the state's from states
-   list, the FSM transitions to that state. Each element in STATES is
-   a list of the following form: (STATE PATTERN [:FROM STATES] . BODY)
-   where STATE is a symbol identifying the state, PATTERN is the
-   pattern to be matched, and STATES is the optional list of from
-   states (it and the :FROM keyword may be excluded), if there is only
-   one state it does not have to be in a list. If a state specifies no
-   from states, it is as if all declared states are specifed as from
-   states. When a state becomes the current state the forms in its
-   BODY are executed, in which the machine may either transition to
-   the next state using the internal function (NEXT NEW-ARG) where
+  "Implements an FSM (Finite State Machine) where each state may
+   specify a pattern (in the form accepted by the trivia pattern
+   matcher) and a list of from states, when the argument matches the
+   pattern of a particular state and the current state is in the
+   state's from states list, the FSM transitions to that state.
+
+   Each element in STATES is a list of the following form: (STATE
+   PATTERN [:FROM STATES] . BODY) where STATE is a symbol identifying
+   the state, PATTERN is the pattern to be matched, and STATES is the
+   optional list of from states (it and the :FROM keyword may be
+   excluded). if there is only one state it does not have to be in a
+   list. If a state specifies no from states, it is as if all states,
+   in the MATCH-STATE form, are specified as from states.
+
+   When a state becomes the current state the forms in its BODY are
+   executed, in which the machine may either transition to the next
+   state using the lexically defined function (NEXT NEW-ARG) where
    NEW-ARG is the new argument to be matched against the patterns. If
    NEXT is never called in body the return value of the last form in
-   BODY becomes the return value of the MATCH-STATE form. The intiial
-   argument is given by evaluated the form ARG. The initial state may
-   be optionally specified, when the first element of STATES is :START
-   the second element is taken as the form to be evaluated to produce
-   the start state, otherwise the start state defaults
-   to :START. Patterns are matched in the order given, the first state
-   whose pattern matches (both the argument pattern and FROM list)
-   becomes the current state."
+   BODY becomes the return value of the MATCH-STATE form.
+
+   The initial argument is given by evaluating the form ARG. The
+   initial state may be optionally specified, when the first element
+   of STATES is :START the second element is taken as the form to be
+   evaluated to produce the start state, otherwise the start state
+   defaults to :START. Patterns are matched in the order given, the
+   first state whose pattern matches (both the argument pattern and
+   FROM list) becomes the current state."
 
   (let ((next (intern (string 'next)))
 	(from-state (intern (string 'from-state))))
