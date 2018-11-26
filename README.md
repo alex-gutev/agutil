@@ -1,7 +1,7 @@
 # AGUTIL
 
-A collection of Common Lisp utility functions and macros not found in
-other utility packages.
+A collection of Common Lisp utility functions and macros not found (to
+the best of my knowledge) in other utility packages.
 
 ## Macro Writing
 
