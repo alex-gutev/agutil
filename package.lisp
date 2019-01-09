@@ -32,6 +32,8 @@
    ;; Macros
    :let-if
    :match-state
+   :nlet
+   :dohash
 
    ;; Macro Writing
    :gensyms

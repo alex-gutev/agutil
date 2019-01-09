@@ -110,3 +110,31 @@
 		    (match* (,from-state ,g!arg)
 		      ,@(mapcar #'make-clause body))))
 	   (,g!next ,start nil ,arg))))))
+
+(defmacro! nlet (name (&rest bindings) &body body)
+  (let* ((vars (mapcar #'ensure-car bindings))
+	 (syms (gensyms vars)))
+    `(let ,bindings
+       (block ,name
+	 (tagbody
+	    ,g!loop
+	    (flet
+		((,name ,syms
+		   (setf ,@(mapcan #'list vars syms))
+		   (go ,g!loop)))
+	      (return-from ,name (progn ,@body))))))))
+
+(defmacro! dohash ((key value hash &optional result) &body body)
+  "Iterates over each element of HASH with the key bound to KEY and
+   the value bound to VALUE. BODY is evaluated on each iteration in an
+   implicit PROGN."
+
+  (let ((key (or key g!key))
+        (value (or value g!value)))
+    `(with-hash-table-iterator (,g!next ,hash)
+       (loop
+          (multiple-value-bind (,g!next-p ,key ,value) (,g!next)
+            (declare (ignorable ,key ,value))
+            (unless ,g!next-p
+              (return ,result))
+            ,@body)))))
