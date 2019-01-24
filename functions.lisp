@@ -43,16 +43,27 @@
 (defun merge-packages (new-package-name &rest packages)
   "Creates a new package with name NEW-PACKAGE-NAME, if it does not
    already exist, into which all external symbols in each package in
-   PACKAGES are imported, by SHADOWING-IMPORT. The external symbols of
-   each package in PACKAGES are imported in the order in which the
-   package appears in the list, thus symbols imported from packages
-   towards the end of the PACKAGES list will shadow symbols imported
-   from packages at the beginning of the list."
+   PACKAGES are imported, by SHADOWING-IMPORT. If the package is a
+   list with :INTERNAL as the first element, the internal symbols of
+   the package (with the name as the second element) are imported
+   instead.
+
+   The external symbols of each package in PACKAGES are imported in
+   the order in which the package appears in the list, thus symbols
+   imported from packages towards the end of the PACKAGES list will
+   shadow symbols imported from packages at the beginning of the
+   list."
 
   (flet ((merge-package (pkg)
-	   (do-external-symbols (sym pkg)
-	     (shadowing-import (list sym))
-	     (export (list sym)))))
+	   (match pkg
+	     ((list :internal name)
+	      (do-symbols (sym name)
+		(shadowing-import (list sym))))
+
+	     (_
+	      (do-external-symbols (sym pkg)
+		(shadowing-import (list sym))
+		(export (list sym)))))))
 
     (let ((*package* (or (find-package new-package-name) (make-package new-package-name :use nil))))
       (mapc #'merge-package packages)
