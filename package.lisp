@@ -34,6 +34,7 @@
    :match-state
    :nlet
    :dohash
+   :update-let
 
    ;; Macro Writing
    :gensyms

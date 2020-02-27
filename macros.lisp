@@ -138,3 +138,50 @@
             (unless ,g!next-p
               (return ,result))
             ,@body)))))
+
+
+(defmacro update-let ((&rest bindings) &body body)
+  "Establishes bindings to variables, which are visible to the forms
+   in BODY, however each binding also has an update form, the result
+   of which is assigned to the variable in the environment of the
+   UPDATE-LET form itself.
+
+   Each element of BINDINGS is a list of the form (VAR INIT-FORM
+   UPDATE-FORM) where var is the variable symbol, INIT-FORM is the
+   form of which the result is bound to VAR. This binding is visible
+   to the forms in BODY. UPDATE-FORM is a form of which the result is
+   assigned to VAR affecting the binding which is visible in the
+   environment of the UPDATE-LET form itself, and not the binding
+   which is visible in BODY. Each UPDATE-FORM is executed after the
+   last form in BODY with the symbol OLD being bound to the value of
+   the corresponding variable in the environment of the UPDATE-LET
+   form.
+
+   The value of the last form in BODY is returned."
+
+  (multiple-value-bind (body declarations) (parse-body body)
+    (let ((syms
+           (loop
+              for (var) in bindings
+              for sym = (gensym (symbol-name var))
+              collect (cons var sym))))
+
+      `(let ,(loop for (var) in bindings
+                for sym = (cdr (assoc var syms))
+                collect (list sym var))
+         (prog1
+             (let ,(loop for (var init) in bindings
+                      collect (list var init))
+               ,@declarations
+               (prog1 (progn ,@body)
+                 ,@(loop
+                      for (var nil update) in bindings
+                      for sym = (cdr (assoc var syms))
+                      collect
+                        `(symbol-macrolet ((,(intern (symbol-name 'old)) ,sym))
+                           (setf ,sym ,update)))))
+
+           ,@(loop
+                for (var) in bindings
+                for sym = (cdr (assoc var syms))
+                collect `(setf ,var ,sym)))))))
