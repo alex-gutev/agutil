@@ -35,6 +35,7 @@
    :nlet
    :dohash
    :update-let
+   :with-struct-slots
 
    ;; Macro Writing
    :gensyms

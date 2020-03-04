@@ -185,3 +185,18 @@
                 for (var) in bindings
                 for sym = (cdr (assoc var syms))
                 collect `(setf ,var ,sym)))))))
+
+(defmacro with-struct-slots (conc-name (&rest slots) object &body body)
+  "Same as WITH-SLOTS however for structures defined by
+   DEFSTRUCT. CONC-NAME is the symbol, passed to the CONC-NAME option
+   to DEFSTRUCT, which is prepended to each symbol in SLOTS to
+   generate the name of the accessor function for the slot."
+
+  (flet ((make-binding (slot)
+           (ematch slot
+             ((or (list var slot)
+                  (and (type symbol) var slot))
+              (list var (symb conc-name slot))))))
+
+    `(with-accessors ,(mapcar #'make-binding slots) ,object
+       ,@body)))
