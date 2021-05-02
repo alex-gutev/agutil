@@ -26,7 +26,7 @@
 (defpackage :agutil
   (:use :cl
 	:alexandria
-	:trivia)
+	:optima)
 
   (:export
    ;; Macros

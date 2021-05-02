@@ -107,7 +107,7 @@
 	  (eq (first states) :start)
 
 	`(labels ((,g!next (,from-state ,g!force ,g!arg)
-		    (match* (,from-state ,g!arg)
+		    (multiple-value-match (values ,from-state ,g!arg)
 		      ,@(mapcar #'make-clause body))))
 	   (,g!next ,start nil ,arg))))))
 

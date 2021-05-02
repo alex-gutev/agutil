@@ -35,4 +35,4 @@
                (:file "functions")
 	       (:file "macros"))
 
-  :depends-on (:alexandria :trivia))
+  :depends-on (:alexandria :optima))
